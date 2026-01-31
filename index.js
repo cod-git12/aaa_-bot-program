@@ -14,7 +14,6 @@ const client = new Client({
 });
 
 const PREFIX = "!";
-const NG_WORDS = ["禁止ワード", "うんこ", "うんち", "死ね", "しね", "タヒね", "ﾀﾋね"];
 
 client.once("ready", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
@@ -22,14 +21,6 @@ client.once("ready", () => {
 
 client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return;
-
-  // NGワード監視
-  for (const w of NG_WORDS) {
-    if (msg.content.includes(w)) {
-      await msg.delete();
-      return msg.channel.send(`❌ ${msg.author} その言葉は禁止されています`);
-    }
-  }
 
   if (!msg.content.startsWith(PREFIX)) return;
 
