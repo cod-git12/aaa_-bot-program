@@ -14,7 +14,7 @@ const client = new Client({
 });
 
 const PREFIX = "!";
-const NG_WORDS = ["禁止ワード", "だめ"];
+const NG_WORDS = ["禁止ワード", "うんこ", "うんち", "死ね", "しね", "タヒね", "ﾀﾋね"];
 
 client.once("ready", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
