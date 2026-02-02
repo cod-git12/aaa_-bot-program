@@ -15,9 +15,26 @@ const client = new Client({
 
 const PREFIX = "!";
 
-client.once("ready", () => {
-  console.log(`✅ Logged in as ${client.user.tag}`);
+const UPDATE_MESSAGE = "1453677204301942826"; // 通知を送るチャンネルID
+
+client.once("ready", async () => {
+  console.log(`Logged in as ${client.user.tag}`);
+
+  const channel = await client.channels.fetch(UPDATE_MESSAGE).catch(() => null);
+  if (!channel) return;
+
+  channel.send({
+    embeds: [
+      {
+        title: "🤖 Bot Update",
+        description: "Botが更新され、再起動しました。",
+        color: 0x00ff99,
+        timestamp: new Date()
+      }
+    ]
+  });
 });
+;
 
 client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return;
@@ -60,5 +77,22 @@ client.on("messageCreate", async (msg) => {
     return msg.channel.send({ embeds: [embed] });
   }
 });
+
+// ===== メンション返信 =====
+const mention_words = ["？", "どうした", "なんかあった？"];
+
+client.on("messageCreate", (msg) => {
+  if (msg.author.bot) return;
+
+  // Botがメンションされたかチェック
+  if (msg.mentions.has(client.user)) {
+    const reply =
+      mention_words[Math.floor(Math.random() * mention_words.length)];
+
+    msg.reply(reply);
+  }
+});
+
+
 
 client.login(process.env.DISCORD_TOKEN);
