@@ -23,7 +23,7 @@ const client = new Client({
   ]
 });
 
-const UPDATE_CHANNEL_ID = "1453677204301942826";
+const UPDATE_CHANNEL_ID = "1456250291627229184";
 const BLOXD_WIKI_BASE = "https://bloxd.wikiru.jp/?";
 
 let cachedPages = new Set();
