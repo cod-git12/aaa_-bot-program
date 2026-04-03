@@ -98,7 +98,7 @@ async function askGemini(question, wikiContext) {
     if (err.message.includes("API key not valid")) {
       return "APIキーが間違っているみたい。APIキーを確認してね。";
     }
-    return "ごめん、AIの接続でエラーが起きちゃった。";
+    return `エラーが発生しました: ${err.message}`;
   }
 }
 
