@@ -88,9 +88,10 @@ const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gem
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{
-        parts: [{ text: `あなたはBloxd攻略のプロです。以下の情報を参考に、質問に日本語で答えてください。\n\n${systemPrompt}\n\n質問: ${question}` }]
-      }],
+        contents: [{
+          role: "user",
+          parts: [{ text: `あなたはBloxd攻略のプロです。以下の情報を参考に、質問に日本語で答えてください。\n\n${systemPrompt}\n\n質問: ${question}` }]
+        }],
       generationConfig: {
         maxOutputTokens: 1000,
         temperature: 0.7
