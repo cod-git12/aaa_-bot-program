@@ -206,4 +206,16 @@ client.on("messageCreate", async (msg) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.once("clientReady", async () => {
+  console.log(`✅️[DISCORD] ログイン成功: ${client.user.tag}`);
+  process.exit(0);
+});
+
+client.on("error", console.error);
+
+client.login(process.env.DISCORD_TOKEN)
+  .then(() => console.log("LOGIN SUCCESS"))
+  .catch(err => {
+    console.error("LOGIN ERROR", err);
+    process.exit(1);
+  });
