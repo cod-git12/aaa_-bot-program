@@ -1,7 +1,8 @@
 const {
   Client,
   GatewayIntentBits,
-  EmbedBuilder
+  EmbedBuilder,
+  Events
 } = require("discord.js");
 const http = require("http");
 
@@ -91,6 +92,7 @@ async function askGemini(question, wikiContext) {
         parts: [{ text: systemPrompt }]
       },
       contents: [{
+        role: "user",
         parts: [{ text: question }]
       }],
       generationConfig: {
@@ -132,7 +134,7 @@ async function searchWikipedia(query) {
   };
 }
 
-client.once("ready", async () => {
+client.once(Events.ClientReady, async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   await fetchPageList();
   setInterval(fetchPageList, 30 * 60 * 1000);
@@ -297,7 +299,7 @@ client.on("messageCreate", async (msg) => {
         embeds.push(
           new EmbedBuilder()
             .setTitle(`❌ ${pageName}`)
-            .setDescription("このページはBloxd攻略Wikiに存在しないよ。")
+            .setDescription("このページはBloxd攻略Wikiに存在しないよ.")
             .setColor(0xff4444)
         );
       } else {
@@ -361,18 +363,10 @@ client.on("messageCreate", async (msg) => {
 });
 
 client.on("debug", (info) => {
+  if (info.includes("Heartbeat")) return;
   console.log(`[Discord Debug] ${info}`);
 });
 
-client.on("warn", (info) => {
-  console.log(`[Discord Warning] ${info}`);
-});
-
-if (!process.env.DISCORD_TOKEN) {
-  console.error("❌ 致命的なエラー: DISCORD_TOKEN が設定されていません！RenderのEnvironmentを確認してください。");
-}
-
 client.login(process.env.DISCORD_TOKEN).catch(err => {
-  console.error("❌ ログインに失敗しました！エラー詳細:");
-  console.error(err);
+  console.error("❌ ログイン失敗:", err);
 });
