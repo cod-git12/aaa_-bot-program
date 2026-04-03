@@ -5,6 +5,7 @@ const {
   Events
 } = require("discord.js");
 const http = require("http");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
@@ -77,45 +78,28 @@ async function fetchWikiPageText(pageName) {
 }
 
 async function askGemini(question, wikiContext) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return "APIキーが設定されていません。";
+
+  // 公式ライブラリの初期化
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
   const systemPrompt = wikiContext
     ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}`
     : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。`;
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return "❌ GeminiのAPIキーが設定されていません。";
-
-const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  /*
-    body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [{ text: `あなたはBloxd攻略のプロです。以下の情報を参考に、質問に日本語で答えてください。\n\n${systemPrompt}\n\n質問: ${question}` }]
-        }],
-      generationConfig: {
-        maxOutputTokens: 1000,
-        temperature: 0.7
-      }
-    })
-  */
-    body: JSON.stringify({
-      contents: [{
-        parts: [{ 
-          text: `あなたはBloxd攻略のプロです。以下のWiki情報を参考にして、質問に日本語で答えてください。\n\n【Wiki情報】\n${systemPrompt}\n\n質問: ${question}` 
-        }]
-      }],
-    })
-  });
-  
-  const data = await res.json();
-  
-  if (data.error) {
-    console.error("❌ API エラー:", data.error);
-    return `APIの取得中にエラーが発生しました（${data.error.message}）`;
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (err) {
+    console.error("[Gemini Error]", err.message);
+    if (err.message.includes("API key not valid")) {
+      return "APIキーが間違っているみたい。APIキーを確認してね。";
+    }
+    return "ごめん、AIの接続でエラーが起きちゃった。";
   }
-  
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "回答を取得できませんでした。";
 }
 
 async function searchWikipedia(query) {
