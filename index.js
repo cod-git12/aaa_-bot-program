@@ -87,6 +87,7 @@ async function askGemini(question, wikiContext) {
 const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+  /*
     body: JSON.stringify({
         contents: [{
           role: "user",
@@ -96,6 +97,14 @@ const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gem
         maxOutputTokens: 1000,
         temperature: 0.7
       }
+    })
+  */
+    body: JSON.stringify({
+      contents: [{
+        parts: [{ 
+          text: `あなたはBloxd攻略のプロです。以下のWiki情報を参考にして、質問に日本語で答えてください。\n\n【Wiki情報】\n${systemPrompt}\n\n質問: ${question}` 
+        }]
+      }],
     })
   });
   
