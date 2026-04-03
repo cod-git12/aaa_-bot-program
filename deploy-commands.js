@@ -42,7 +42,7 @@ const guildId = "1453664112973447311";
   try {
     console.log("スラッシュコマンドを登録中...");
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      Routes.applicationGuildCommands(clientId, guildId),
       { body: commands }
     );
     console.log(`✅ ${commands.length}件のコマンドを登録しました。`);
