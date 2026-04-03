@@ -21,7 +21,7 @@ const client = new Client({
   ]
 });
 
-const UPDATE_CHANNEL_ID = "1456250291627229184";
+const UPDATE_CHANNEL_ID = "1453677204301942826";
 const BLOXD_WIKI_BASE = "https://bloxd.wikiru.jp/?";
 
 let cachedPages = new Set();
@@ -79,7 +79,6 @@ async function searchWikipedia(query) {
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
-  console.log(`✅️[DISCORD] ログイン成功: ${client.user.tag}`);
   await fetchPageList();
   setInterval(fetchPageList, 30 * 60 * 1000);
 
@@ -115,6 +114,7 @@ client.on("interactionCreate", async (interaction) => {
         { name: "/wikipedia <ワード>", value: "日本語Wikipediaで記事を検索" },
         { name: "/random", value: "Bloxd攻略Wikiのランダムなページを表示" },
         { name: "/check <ページ名>", value: "Bloxd攻略Wikiにページが存在するか確認" },
+        { name: "/search <キーワード>", value: "Bloxd攻略Wikiのページをキーワードで部分一致検索" },
         { name: "━━ ショートカット ━━", value: "`BKW: ページ名!` と書くとwikiリンクを送信" }
       )
       .setFooter({ text: "Bloxd攻略Wiki: bloxd.wikiru.jp" });
@@ -127,7 +127,7 @@ client.on("interactionCreate", async (interaction) => {
     try {
       const result = await searchWikipedia(query);
       if (!result) {
-        return interaction.editReply(`❌ 「${query}」に関するWikipedia記事が見つからなかったよ。`);
+        return interaction.editReply(`❌ 「${query}」に関するWikipedia記事が見つかりませんでした。`);
       }
       const embed = new EmbedBuilder()
         .setTitle(`📖 ${result.title}`)
@@ -140,7 +140,7 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.editReply({ embeds: [embed] });
     } catch (err) {
       console.error(err);
-      return interaction.editReply("❌ Wikipedia取得中にエラーが発生したよ。もっかい試してね。");
+      return interaction.editReply("❌ Wikipedia取得中にエラーが発生しました。");
     }
   }
 
@@ -164,20 +164,51 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "check") {
     const pageName = interaction.options.getString("ページ名");
     if (cachedPages.size === 0) {
-      return interaction.reply("❌ ページリストの取得中だよ。しばらく待ってから試してね。");
+      return interaction.reply("❌ ページリストの取得中です。しばらく待ってから試してください。");
     }
     if (pageExists(pageName)) {
       const url = buildBloxdWikiUrl(pageName);
       const embed = new EmbedBuilder()
         .setTitle(`✅ ${pageName}`)
-        .setDescription(`ページがあるよ。\n[Bloxd攻略Wikiで開く](${url})`)
+        .setDescription(`ページが存在します。\n[Bloxd攻略Wikiで開く](${url})`)
         .setURL(url)
         .setColor(0x00cc66)
         .setFooter({ text: "Bloxd攻略Wiki • bloxd.wikiru.jp" });
       return interaction.reply({ embeds: [embed] });
     } else {
-      return interaction.reply(`❌ 「${pageName}」というページはBloxd攻略Wikiに存在しないよ。`);
+      return interaction.reply(`❌ 「${pageName}」というページはBloxd攻略Wikiに存在しません。`);
     }
+  }
+
+  if (commandName === "search") {
+    const keyword = interaction.options.getString("キーワード");
+    if (cachedPages.size === 0) {
+      return interaction.reply("❌ ページリストの取得中です。しばらく待ってから試してください。");
+    }
+    const matched = [...cachedPages].filter(p =>
+      p.toLowerCase().includes(keyword.toLowerCase())
+    );
+    if (matched.length === 0) {
+      return interaction.reply(`🔍 「${keyword}」を含むページは見つかりませんでした。`);
+    }
+    const lines = matched.map(p => `• [${p}](${buildBloxdWikiUrl(p)})`);
+    const MAX_CHARS = 3800;
+    let description = "";
+    let truncated = false;
+    for (const line of lines) {
+      if ((description + "\n" + line).length > MAX_CHARS) {
+        truncated = true;
+        break;
+      }
+      description += (description ? "\n" : "") + line;
+    }
+    if (truncated) description += `\n\n*他にも結果があります。キーワードを絞り込んでください。*`;
+    const embed = new EmbedBuilder()
+      .setTitle(`🔍 「${keyword}」の検索結果 (${matched.length}件)`)
+      .setDescription(description)
+      .setColor(0x57c4ff)
+      .setFooter({ text: "Bloxd攻略Wiki • bloxd.wikiru.jp" });
+    return interaction.reply({ embeds: [embed] });
   }
 });
 
@@ -188,7 +219,7 @@ client.on("messageCreate", async (msg) => {
   if (bkwMatch) {
     const pageName = bkwMatch[1].trim();
     if (!pageExists(pageName)) {
-      return msg.reply(`❌ 「${pageName}」というページはBloxd攻略Wikiに存在しないよ。`);
+      return msg.reply(`❌ 「${pageName}」というページはBloxd攻略Wikiに存在しません。`);
     }
     const url = buildBloxdWikiUrl(pageName);
     const embed = new EmbedBuilder()
@@ -207,11 +238,4 @@ client.on("messageCreate", async (msg) => {
   }
 });
 
-client.on("error", console.error);
-
-client.login(process.env.DISCORD_TOKEN)
-  .then(() => console.log("LOGIN SUCCESS"))
-  .catch(err => {
-    console.error("LOGIN ERROR", err);
-    process.exit(1);
-  });
+client.login(process.env.DISCORD_TOKEN);

@@ -31,18 +31,24 @@ const commands = [
         .setRequired(true)
     ),
 
+  new SlashCommandBuilder()
+    .setName("search")
+    .setDescription("Bloxd攻略Wikiのページをキーワードで検索します")
+    .addStringOption(opt =>
+      opt.setName("キーワード")
+        .setDescription("検索するキーワード（部分一致）")
+        .setRequired(true)
+    ),
+
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-
-const clientId = "1466984129512997049"; 
-const guildId = "1453664112973447311";
 
 (async () => {
   try {
     console.log("スラッシュコマンドを登録中...");
     await rest.put(
-      Routes.applicationGuildCommands(clientId, guildId),
+      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
       { body: commands }
     );
     console.log(`✅ ${commands.length}件のコマンドを登録しました。`);
