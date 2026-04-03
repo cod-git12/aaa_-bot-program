@@ -79,6 +79,7 @@ async function searchWikipedia(query) {
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
+  console.log(`✅️[DISCORD] ログイン成功: ${client.user.tag}`);
   await fetchPageList();
   setInterval(fetchPageList, 30 * 60 * 1000);
 
@@ -204,11 +205,6 @@ client.on("messageCreate", async (msg) => {
   if (msg.mentions.has(client.user)) {
     msg.reply(mentionReplies[Math.floor(Math.random() * mentionReplies.length)]);
   }
-});
-
-client.once("clientReady", async () => {
-  console.log(`✅️[DISCORD] ログイン成功: ${client.user.tag}`);
-  process.exit(0);
 });
 
 client.on("error", console.error);
