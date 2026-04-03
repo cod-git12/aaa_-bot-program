@@ -82,21 +82,20 @@ async function askGemini(question, wikiContext) {
   if (!apiKey) return "APIキーが設定されていません。";
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  //const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1beta' });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = wikiContext
-    ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}`
-    : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。`;
+    ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
+    : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。\n\n【質問】\n${question}`;
 
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();
   } catch (err) {
-    console.error("[Gemini Error]", err.message);
+    console.error("❌ [Gemini Error]", err.message);
     if (err.message.includes("API key not valid")) {
-      return "APIキーが間違っているみたい。APIキーを確認してね。";
+      return "APIキーが間違っているよ。APIキーを確認してね。";
     }
     return `エラーが発生しました: ${err.message}`;
   }
@@ -290,7 +289,7 @@ client.on("messageCreate", async (msg) => {
         embeds.push(
           new EmbedBuilder()
             .setTitle(`❌ ${pageName}`)
-            .setDescription("このページはBloxd攻略Wikiに存在しないよ.")
+            .setDescription("このページはBloxd攻略Wikiに存在しないよ。")
             .setColor(0xff4444)
         );
       } else {
@@ -314,7 +313,7 @@ client.on("messageCreate", async (msg) => {
       .trim();
 
     if (!question) {
-      return msg.reply("質問を入力してね！（例: `<@1466984129512997049> ベッドウォーズの攻略を教えて！`）");
+      return msg.reply("質問を入力してね！（例: `@Bot ベッドウォーズの攻略を教えて！`）");
     }
 
     const thinkingMsg = await msg.reply("🤔 考え中...");
