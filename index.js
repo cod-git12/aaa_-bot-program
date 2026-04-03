@@ -84,15 +84,17 @@ async function askGemini(question, wikiContext) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return "❌ GeminiのAPIキーが設定されていません。";
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {    method: "POST",
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `以下の指示に従って回答してください：\n${systemPrompt}\n\n質問：${question}` }]
-        }
-      ],
+      system_instruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      contents: [{
+        role: "user",
+        parts: [{ text: question }]
+      }],
       generationConfig: {
         maxOutputTokens: 1000,
       }
