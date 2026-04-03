@@ -83,7 +83,7 @@ async function askGemini(question, wikiContext) {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" },{ apiVersion: "v1beta" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" },{ apiVersion: "v1beta" });
 
     const prompt = wikiContext
       ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
