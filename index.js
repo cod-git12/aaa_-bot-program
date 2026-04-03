@@ -81,14 +81,14 @@ async function askGemini(question, wikiContext) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return "APIキーが設定されていません。";
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-  const prompt = wikiContext
-    ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
-    : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。\n\n【質問】\n${question}`;
-
   try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" },{ apiVersion: "v1beta" });
+
+    const prompt = wikiContext
+      ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
+      : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。\n\n【質問】\n${question}`;
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();
@@ -96,6 +96,9 @@ async function askGemini(question, wikiContext) {
     console.error("❌ [Gemini Error]", err.message);
     if (err.message.includes("API key not valid")) {
       return "APIキーが間違っているよ。APIキーを確認してね。";
+    }
+    if (err.message.includes("location is not supported")) {
+      return "エラー: Renderのサーバーの場所がGeminiに対応していません。apiVersionをv1betaに変えて試してみて！";
     }
     return `エラーが発生しました: ${err.message}`;
   }
