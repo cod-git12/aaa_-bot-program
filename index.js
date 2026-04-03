@@ -88,13 +88,12 @@ async function askGemini(question, wikiContext) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      contents: [{
-        role: "user",
-        parts: [{ text: question }]
-      }],
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `以下の指示に従って回答してください：\n${systemPrompt}\n\n質問：${question}` }]
+        }
+      ],
       generationConfig: {
         maxOutputTokens: 1000,
       }
