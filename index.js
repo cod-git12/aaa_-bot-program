@@ -361,4 +361,7 @@ client.on("messageCreate", async (msg) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN).catch(err => {
+  console.error("❌ ログインに失敗したよ！理由はこちら:");
+  console.error(err);
+});
