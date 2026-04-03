@@ -75,7 +75,6 @@ async function fetchWikiPageText(pageName) {
   }
 }
 
-// 🤖 ClaudeからGemini APIに変更した関数
 async function askGemini(question, wikiContext) {
   const systemPrompt = wikiContext
     ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}`
@@ -361,7 +360,19 @@ client.on("messageCreate", async (msg) => {
   }
 });
 
+client.on("debug", (info) => {
+  console.log(`[Discord Debug] ${info}`);
+});
+
+client.on("warn", (info) => {
+  console.log(`[Discord Warning] ${info}`);
+});
+
+if (!process.env.DISCORD_TOKEN) {
+  console.error("❌ 致命的なエラー: DISCORD_TOKEN が設定されていません！RenderのEnvironmentを確認してください。");
+}
+
 client.login(process.env.DISCORD_TOKEN).catch(err => {
-  console.error("❌ ログインに失敗したよ！理由はこちら:");
+  console.error("❌ ログインに失敗しました！エラー詳細:");
   console.error(err);
 });
