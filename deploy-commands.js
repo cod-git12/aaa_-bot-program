@@ -35,6 +35,9 @@ const commands = [
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
+const clientId = "1466984129512997049"; 
+const guildId = "1453664112973447311";
+
 (async () => {
   try {
     console.log("スラッシュコマンドを登録中...");
