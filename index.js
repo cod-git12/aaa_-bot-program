@@ -84,16 +84,16 @@ async function askGemini(question, wikiContext) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return "❌ GeminiのAPIキーが設定されていません。";
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        role: "user",
-        parts: [{ text: `以下の指示に従って回答してください：\n${systemPrompt}\n\n質問：${question}` }]
+        parts: [{ text: `あなたはBloxd攻略のプロです。以下の情報を参考に、質問に日本語で答えてください。\n\n${systemPrompt}\n\n質問: ${question}` }]
       }],
       generationConfig: {
         maxOutputTokens: 1000,
+        temperature: 0.7
       }
     })
   });
