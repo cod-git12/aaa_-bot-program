@@ -356,13 +356,17 @@ client.on("messageCreate", async (msg) => {
         urlMatched.push(decodeURIComponent(m[1].replace(/\+/g, " ")));
       }
 
+      const directMatched = [...cachedPages].filter(p => 
+        question.includes(p) || question.toLowerCase().includes(p.toLowerCase())
+      );
+
       const keywordMatched = [...cachedPages].filter(p =>
         p.toLowerCase().split(/[\/\s]/).some(part =>
           question.toLowerCase().includes(part.toLowerCase()) && part.length >= 2
         )
       );
 
-      const allMatched = [...new Set([...urlMatched, ...keywordMatched])];
+      const allMatched = [...new Set([...urlMatched, ...directMatched, ...keywordMatched])];
 
       let wikiContext = null;
       if (allMatched.length > 0) {
