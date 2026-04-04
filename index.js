@@ -85,7 +85,7 @@ async function askGemini(question, wikiContext) {
   if (!apiKey) return "APIキーが設定されてないよ。bot担当者に確認してね。";
   
   const modelName = "gemini-3.1-flash-lite";
-  const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
   const prompt = wikiContext
     ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
