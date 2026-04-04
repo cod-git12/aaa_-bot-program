@@ -60,7 +60,7 @@ const commands = [
           { name: "ドイツ語", value: "de" }
         )
     ),
-    
+
     new SlashCommandBuilder()
     .setName("re-translate")
     .setDescription("逆翻訳（日本語→指定言語→日本語）を行います")
@@ -83,7 +83,16 @@ const commands = [
     .setDescription("多段翻訳で意味をめちゃくちゃにします（おもしろ翻訳）")
     .addStringOption(opt => 
       opt.setName("テキスト").setDescription("翻訳したい文字").setRequired(true)
-    )
+    ),
+
+  new SlashCommandBuilder()
+    .setName("profile")
+    .setDescription("ユーザーのプロフィール情報を表示します")
+    .addUserOption(opt =>
+      opt.setName("ユーザー")
+        .setDescription("情報をみたいユーザー（指定しない場合は自分の情報）")
+        .setRequired(false)
+    ),
 
 ].map(cmd => cmd.toJSON());
 

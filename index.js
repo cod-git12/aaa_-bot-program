@@ -386,6 +386,66 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.editReply(`❌ 翻訳の旅に失敗したよ。もう一度試してね。\nエラー内容: ${err}`);
     }
   }
+
+  if (commandName === "profile") {
+    const targetUser = interaction.options.getUser("ユーザー") || interaction.user;
+    const targetMember = interaction.options.getMember("ユーザー") || interaction.member;
+
+    const BOT_ADMIN_ID = "1324865769892352011"; //5kaideta_yuuto
+    const WIKI_ADMIN_ID = "1382679144072216648"; //aaa_
+    const EDITOR_IDS = [
+      "1382679144072216648", //aaa_
+      "1324865769892352011", //5kaideta_yuuto
+      "1367256093738406049",  //_ryokuryu_
+      "1035491447358623765", //yeyyey_yey_
+      "1463827906739306496", //1000yen440
+      "1136109122257952819", //kentaki_prototype
+      "860527956074168341", //bixbix16
+      "1468214702071873651", //b1x0527
+      "1381991055410593872", //re_0916 - ReaF6190
+      "951204310270767114", //m6_mkt
+      "1175423804407824397", //yuzen121_67832
+      "1324865769892352011"
+    ];
+
+    let customRoles = [];
+
+    if (targetUser.id === BOT_ADMIN_ID) {
+      customRoles.push("👑 Bot管理者");
+    }
+
+    if (targetUser.id === WIKI_ADMIN_ID){
+      customRoles.push("👑 Wiki管理者");
+    }
+
+    if (EDITOR_IDS.includes(targetUser.id)) {
+      customRoles.push("📝 Wiki編集者");
+    }
+
+    if (customRoles.length === 0) {
+      customRoles.push("👤 一般ユーザー");
+    }
+
+    const roleDisplay = customRoles.join("\n");
+
+    const createdTimestamp = Math.floor(targetUser.createdTimestamp / 1000);
+    const joinedTimestamp = targetMember ? Math.floor(targetMember.joinedTimestamp / 1000) : null;
+
+    const embed = new EmbedBuilder()
+      .setTitle(`${targetUser.globalName || targetUser.username} のプロフィール`)
+      .setThumbnail(targetUser.displayAvatarURL({ dynamic: true, size: 512 }))
+      .addFields(
+        { name: "📛 ユーザー名", value: targetUser.username, inline: true },
+        { name: "🎖️ 独自役職", value: roleDisplay, inline: true },
+        { name: "🤖 Botかどうか", value: targetUser.bot ? "はい" : "いいえ", inline: true },
+        { name: "📅 Discord登録日時", value: `<t:${createdTimestamp}:F>\n(<t:${createdTimestamp}:R>)` },
+        { name: "📥 サーバー参加日時", value: joinedTimestamp ? `<t:${joinedTimestamp}:F>\n(<t:${joinedTimestamp}:R>)` : "取得不可（サーバーにいません）" }
+      )
+      .setColor(targetUser.id === ADMIN_ID ? 0xffd700 : 0x57c4ff)
+      .setFooter({ text: `ユーザーID: ${targetUser.id}` });
+
+    return interaction.reply({ embeds: [embed] });
+  }
 });
 
 client.on("messageCreate", async (msg) => {
