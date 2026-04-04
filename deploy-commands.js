@@ -50,8 +50,15 @@ const commands = [
     )
     .addStringOption(opt =>
       opt.setName("言語")
-        .setDescription("翻訳先の言語")
-        .setRequired(false)
+        .setDescription("翻訳先の言語 (デフォルトは日本語)")
+        .setRequired(false).addChoices(
+          { name: "日本語", value: "ja" },
+          { name: "英語", value: "en" },
+          { name: "韓国語", value: "ko" },
+          { name: "中国語", value: "zh" },
+          { name: "フランス語", value: "fr" },
+          { name: "ドイツ語", value: "de" }
+        )
     ),
 
 ].map(cmd => cmd.toJSON());
