@@ -28,6 +28,7 @@ const client = new Client({
 
 const UPDATE_CHANNEL_ID = "1456250291627229184";
 const BLOXD_WIKI_BASE = "https://bloxd.wikiru.jp/?";
+const TRANSLATE_GAS_URL = process.env.TRANSLATE_GAS_URL;
 
 let cachedPages = new Set();
 
@@ -297,6 +298,37 @@ client.on("interactionCreate", async (interaction) => {
       .setFooter({ text: "Bloxd攻略Wiki • bloxd.wikiru.jp" });
     return interaction.reply({ embeds: [embed] });
   }
+
+  if (commandName === "translate") {
+    const text = interaction.options.getString("テキスト");
+    const target = interaction.options.getString("言語") || "ja";
+
+    await interaction.deferReply();
+
+    if (!TRANSLATE_GAS_URL) {
+      return interaction.editReply("❌ 翻訳用のURLが設定されてないよ。Renderの設定を確認してね。");
+    }
+
+    try {
+      const res = await fetch(`${TRANSLATE_GAS_URL}?text=${encodeURIComponent(text)}&target=${target}`);
+      const translated = await res.text();
+
+      const embed = new EmbedBuilder()
+        .setTitle("🌐 翻訳結果！")
+        .addFields(
+          { name: "原文", value: text.length > 1024 ? text.slice(0, 1021) + "..." : text },
+          { name: "翻訳", value: translated.length > 1024 ? translated.slice(0, 1021) + "..." : translated }
+        )
+        .setColor(0x57c4ff)
+        .setFooter({ text: "Powered by Google Translate (GAS)" });
+
+      return interaction.editReply({ embeds: [embed] });
+    } catch (err) {
+      console.error("❌ 翻訳エラー:", err);
+      return interaction.editReply("❌ 翻訳中にエラーが発生したよ。");
+    }
+  }
+});
 });
 
 client.on("messageCreate", async (msg) => {

@@ -39,6 +39,20 @@ const commands = [
         .setDescription("検索するキーワード（部分一致）")
         .setRequired(true)
     ),
+  
+  new SlashCommandBuilder()
+    .setName("translate")
+    .setDescription("テキストを翻訳します")
+    .addStringOption(opt =>
+      opt.setName("テキスト")
+        .setDescription("翻訳したい文字")
+        .setRequired(true)
+    )
+    .addStringOption(opt =>
+      opt.setName("言語")
+        .setDescription("翻訳先の言語")
+        .setRequired(false)
+    ),
 
 ].map(cmd => cmd.toJSON());
 
