@@ -82,13 +82,13 @@ async function fetchWikiPageText(pageName) {
 
 async function askGemini(question, wikiContext) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return "APIキーが設定されていません。";
-
-  const modelName = "gemini-2.5-flash"; 
+  if (!apiKey) return "APIキーが設定されてないよ。bot担当者に確認してね。";
+  
+  const modelName = "gemini-3.1-flash-lite";
   const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
 
   const prompt = wikiContext
-    ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で簡潔に答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
+    ? `あなたはBloxd攻略Wikiをもとに質問に答えるアシスタントです。以下のWikiの内容を参考に、日本語で答えてください。Wikiに載っていない情報については「Wikiには記載がありません」と伝えてください。\n\n【Wikiの内容】\n${wikiContext}\n\n【質問】\n${question}`
     : `あなたはBloxdというゲームの攻略アシスタントです。Bloxd攻略Wiki（bloxd.wikiru.jp）をもとに、日本語で簡潔に答えてください。\n\n【質問】\n${question}`;
 
   const requestBody = {
@@ -115,10 +115,10 @@ async function askGemini(question, wikiContext) {
         return "APIキーが間違っているよ。APIキーを確認してね。";
       }
       if (errMsg.includes("location is not supported")) {
-        return "エラー: Renderのサーバーの場所がGeminiに対応していません。別のRegionを試してね。";
+        return "エラー: サーバーの場所が対応していないよ。bot担当者に確認してね。";
       }
       if (response.status === 429) {
-        return `エラー(429): Googleの無料枠がまだ準備中か、制限がかかっています。10分くらい待ってみてね。`;
+        return "質問が多すぎて今対応しきれてないよ！少しあとにまた試してみてね。";
       }
       
       return `Google側でエラーが発生しました (${response.status}): ${errMsg}`;
