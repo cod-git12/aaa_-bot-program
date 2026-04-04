@@ -60,6 +60,30 @@ const commands = [
           { name: "ドイツ語", value: "de" }
         )
     ),
+    
+    new SlashCommandBuilder()
+    .setName("re-translate")
+    .setDescription("逆翻訳（日本語→指定言語→日本語）を行います")
+    .addStringOption(opt => 
+      opt.setName("テキスト").setDescription("翻訳したい文字").setRequired(true)
+    )
+    .addStringOption(opt =>
+      opt.setName("経由言語").setDescription("一度どの言語に変えるか選んでね")
+        .addChoices(
+          { name: "英語", value: "en" },
+          { name: "韓国語", value: "ko" },
+          { name: "中国語", value: "zh" },
+          { name: "フランス語", value: "fr" },
+          { name: "ドイツ語", value: "de" }
+        )
+    ),
+
+  new SlashCommandBuilder()
+    .setName("multi-translate")
+    .setDescription("多段翻訳で意味をめちゃくちゃにします（おもしろ翻訳）")
+    .addStringOption(opt => 
+      opt.setName("テキスト").setDescription("翻訳したい文字").setRequired(true)
+    )
 
 ].map(cmd => cmd.toJSON());
 

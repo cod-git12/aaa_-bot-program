@@ -164,6 +164,12 @@ async function searchWikipedia(query) {
   };
 }
 
+async function getTranslation(text, target) {
+  const url = `${process.env.TRANSLATE_GAS_URL}?text=${encodeURIComponent(text)}&target=${target}`;
+  const res = await fetch(url);
+  return await res.text();
+}
+
 client.once(Events.ClientReady, async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   await fetchPageList();
@@ -326,6 +332,58 @@ client.on("interactionCreate", async (interaction) => {
     } catch (err) {
       console.error("❌ 翻訳エラー:", err);
       return interaction.editReply("❌ 翻訳中にエラーが発生したよ。");
+    }
+  }
+
+  if (commandName === "re-translate") {
+    const text = interaction.options.getString("テキスト");
+    const midLang = interaction.options.getString("経由言語") || "en";
+    await interaction.deferReply();
+
+    try {
+      const step1 = await getTranslation(text, midLang);
+      const step2 = await getTranslation(step1, "ja");
+
+      const embed = new EmbedBuilder()
+        .setTitle("🔄 逆翻訳結果！")
+        .addFields(
+          { name: "原文", value: text },
+          { name: `経由 (${midLang})`, value: step1 },
+          { name: "結果 (日本語)", value: step2 }
+        )
+        .setColor(0x00ffcc);
+      return interaction.editReply({ embeds: [embed] });
+    } catch (err) {
+      return interaction.editReply(`❌ 翻訳に失敗したよ。もう一度試してね。\nエラー内容: ${err}`);
+    }
+  }
+
+  if (commandName === "multi-translate") {
+    const text = interaction.options.getString("テキスト");
+    await interaction.deferReply();
+
+    try {
+      const langs = ["ko", "fr", "de", "zh", "ja"]; 
+      let currentText = text;
+      let path = "日本語";
+
+      for (const lang of langs) {
+        currentText = await getTranslation(currentText, lang);
+        path += ` ➔ ${lang}`;
+      }
+
+      const embed = new EmbedBuilder()
+        .setTitle("🤪 おもしろ翻訳")
+        .setDescription(`**ルート:** ${path}`)
+        .addFields(
+          { name: "ビフォー", value: text },
+          { name: "アフター", value: currentText }
+        )
+        .setColor(0xff9900)
+        .setFooter({ text: "5段階の翻訳を経て意味が崩壊したよ。" });
+      return interaction.editReply({ embeds: [embed] });
+    } catch (err) {
+      return interaction.editReply(`❌ 翻訳の旅に失敗したよ。もう一度試してね。\nエラー内容: ${err}`);
     }
   }
 });
