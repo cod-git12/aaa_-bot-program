@@ -84,7 +84,7 @@ async function askGemini(question, wikiContext) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return "APIキーが設定されてないよ。bot担当者に確認してね。";
   
-  const modelName = "gemini-3.1-flash-lite";
+  const modelName = "gemini-3.1-flash-lite-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
   const prompt = wikiContext
