@@ -64,14 +64,17 @@ async function fetchWikiPageText(pageName) {
     const bodyMatch = html.match(/<div id="body">([\s\S]*?)<\/div>/);
     if (!bodyMatch) return null;
     const text = bodyMatch[1]
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/tr>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;/g, " ")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
-      .replace(/\s{2,}/g, " ")
+      .replace(/[ \t]+/g, " ")
       .trim();
-    return text.slice(0, 6000);
+    return text.slice(0, 30000);
   } catch {
     return null;
   }
@@ -346,15 +349,24 @@ client.on("messageCreate", async (msg) => {
     const thinkingMsg = await msg.reply("🤔 考え中...");
 
     try {
-      const matched = [...cachedPages].filter(p =>
+      const urlRegex = /https:\/\/bloxd\.wikiru\.jp\/\?([^\s?]+)/g;
+      let urlMatched = [];
+      let m;
+      while ((m = urlRegex.exec(question)) !== null) {
+        urlMatched.push(decodeURIComponent(m[1].replace(/\+/g, " ")));
+      }
+
+      const keywordMatched = [...cachedPages].filter(p =>
         p.toLowerCase().split(/[\/\s]/).some(part =>
           question.toLowerCase().includes(part.toLowerCase()) && part.length >= 2
         )
       );
 
+      const allMatched = [...new Set([...urlMatched, ...keywordMatched])];
+
       let wikiContext = null;
-      if (matched.length > 0) {
-        const topPages = matched.slice(0, 3);
+      if (allMatched.length > 0) {
+        const topPages = allMatched.slice(0, 5);
         const texts = await Promise.all(topPages.map(p => fetchWikiPageText(p)));
         const combined = topPages
           .map((p, i) => texts[i] ? `【${p}】\n${texts[i]}` : null)
