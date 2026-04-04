@@ -9,8 +9,11 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end("Bot is alive!");
+  res.writeHead(200, { 
+    "Content-Type": "text/plain",
+    "Content-Length": "12"
+  });
+  res.end("Bot is alive");
 }).listen(PORT, () => {
   console.log(`✅ HTTP server listening on port ${PORT}`);
 });
